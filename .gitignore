@@ -1,0 +1,8 @@
+﻿.history/
+.env
+.venv/
+__pycache__/
+.history/
+build/
+dist/
+.env
