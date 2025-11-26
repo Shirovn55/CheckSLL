@@ -7,8 +7,7 @@ Giao diện chỉ còn 3 nút:
 - 🟡 Lọc Đơn Chưa GTC (.txt)
 """
 
-from flask import request, jsonify, Response   # bỏ Flask, không cần app riêng
-
+from flask import Flask, request, jsonify, Response
 import httpx, concurrent.futures as cf, threading, time, re
 from typing import Any, Dict, List, Tuple, Union
 
@@ -29,6 +28,7 @@ DEFAULT_HEADERS = {
 }
 
 # ========================= APP & STATE =========================
+app = Flask(__name__)
 _last = {"results": [], "updated": 0.0}
 _last_lock = threading.Lock()
 
@@ -376,7 +376,11 @@ def check_one_cookie(cookie_line: str)->Dict[str,Any]:
     return out
 
 # ============================= ROUTES =============================
+@app.get("/")
+def index():
+    return Response(TEMPLATE, mimetype="text/html; charset=utf-8")
 
+@app.post("/api/check")
 def api_check():
     payload=request.get_json(silent=True) or {}
     cookies=payload.get("cookies",[])
@@ -396,3 +400,6 @@ def api_check():
 
 # (Không cần /api/last vì export dùng dữ liệu ở client — window.__lastResults)
 
+# ============================= MAIN =============================
+if __name__=="__main__":
+    app.run(host="127.0.0.1", port=8000, debug=False, threaded=True)
